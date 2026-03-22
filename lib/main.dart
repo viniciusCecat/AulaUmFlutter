@@ -1,6 +1,6 @@
-import 'dart:io';
 import 'dart:math';
 
+import 'package:aula_um/telaDois.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -9,22 +9,19 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
-      theme: ThemeData(
-
-        colorScheme: .fromSeed(seedColor: Colors.purpleAccent),
-      ),
-      home: const MyHomePage(title: 'Primeira pagina'),
+      home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key,
-    required this.title});
+  const MyHomePage({super.key, required this.title});
 
   final String title;
 
@@ -33,56 +30,112 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  String imagemApp = 'assets/images/padrao.png';
 
-  void _incrementCounter() {
-    Random random = new Random();
+  final List<String> opcoes = [
+    'assets/images/pedra.png',
+    'assets/images/papel.png',
+    'assets/images/tesoura.png',
+  ];
+
+  void jogar(String escolhaJogador) {
+    final random = Random();
+    final escolhaDoApp = opcoes[random.nextInt(opcoes.length)];
+    String resultado = 'empatou';
+
+    if (escolhaJogador == escolhaDoApp) {
+      resultado = 'empatou';
+    } else if ((escolhaJogador == 'assets/images/pedra.png' &&
+            escolhaDoApp == 'assets/images/tesoura.png') ||
+        (escolhaJogador == 'assets/images/papel.png' &&
+            escolhaDoApp == 'assets/images/pedra.png') ||
+        (escolhaJogador == 'assets/images/tesoura.png' &&
+            escolhaDoApp == 'assets/images/papel.png')) {
+      resultado = 'venceu';
+    } else {
+      resultado = 'perdeu';
+    }
+
     setState(() {
-        _counter = random.nextInt(4);
+      imagemApp = escolhaDoApp;
+    });
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TelaDois(
+          escolhaApp: escolhaDoApp,
+          escolhaJogador: escolhaJogador,
+          resultado: resultado,
+        ),
+      ),
+    ).then((_) {
+      setState(() {
+        imagemApp = 'assets/images/padrao.png';
+      });
     });
   }
 
   @override
   Widget build(BuildContext context) {
-
-    List<String>  listaTexto = ['Texto um', 'TExto dois' , 'Texto tres' , 'Texto quatro' ];
-
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color.fromRGBO(0, 255, 0, 100),
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: .center,
-          children: [
-            Text(listaTexto[_counter]),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-            ElevatedButton(onPressed: ()=>{
-              setState(() {
-                _counter = 0;
-              })
-            }, child: Text("Zerar o valor:")),
-            Container(
-              height: 150,
-              padding: EdgeInsets.all(10),
-              color: Colors.black,
-              child: Image.asset('images/knuckles.webp'),
-              margin: EdgeInsets.only(top: 20),
-            )
-
-          ],
+        backgroundColor: const Color(0xFFFF3B3B),
+        title: const Text(
+          'Pedra,Papel, Tesoura',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
+      backgroundColor: const Color(0xFFE9E9E9),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Column(
+                children: [
+                  Image.asset(imagemApp, height: 120, width: 120),
+                  const SizedBox(height: 14),
+                  const Text(
+                    'Escolha do APP',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  GestureDetector(
+                    onTap: () => jogar('assets/images/pedra.png'),
+                    child: Image.asset(
+                      'assets/images/pedra.png',
+                      height: 86,
+                      width: 86,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () => jogar('assets/images/papel.png'),
+                    child: Image.asset(
+                      'assets/images/papel.png',
+                      height: 86,
+                      width: 86,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () => jogar('assets/images/tesoura.png'),
+                    child: Image.asset(
+                      'assets/images/tesoura.png',
+                      height: 86,
+                      width: 86,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
-      backgroundColor: Color.fromRGBO(255,0,0,0),
     );
   }
 }
